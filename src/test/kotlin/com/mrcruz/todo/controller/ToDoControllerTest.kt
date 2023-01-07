@@ -4,8 +4,8 @@ import com.mrcruz.todo.exception.ErrorMessage
 import com.mrcruz.todo.model.ToDo
 import com.mrcruz.todo.model.ToDoRequest
 import com.mrcruz.todo.repository.ToDoRepository
+import io.micronaut.data.model.Page
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
@@ -13,10 +13,10 @@ import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import kotlin.random.Random
 
 @MicronautTest
 internal class ToDoControllerTest {
@@ -30,10 +30,23 @@ internal class ToDoControllerTest {
 
     @BeforeEach
     fun setUp() {
+        var toDos: ArrayList<ToDo> = ArrayList<ToDo>()
+        for( i in 0..4){
+            var toDo: ToDo = ToDo("ToDo ${i+1}")
+            if(i % 2 == 0) {
+                toDo.feito = true
+            }
+            toDos.add(toDo)
+        }
+
+        toDoRepository.saveAll(toDos)
+
+
     }
 
     @AfterEach
     fun tearDown() {
+        toDoRepository.deleteAll()
     }
 
     @Test
@@ -63,7 +76,21 @@ internal class ToDoControllerTest {
 
 
     @Test
-    fun listar() {
+    fun deveListarTodosOsToDos() {
+        val response = client.toBlocking().exchange("/", Page::class.java)
+
+        assertEquals(HttpStatus.OK, response.status)
+        assertNotNull(response.body())
+        assertEquals(5,response.body().content.size)
+    }
+
+    @Test
+    fun deveListarTodosOsToDosComFiltro() {
+        val response = client.toBlocking().exchange("/?feito=true", Page::class.java)
+
+        assertEquals(HttpStatus.OK, response.status)
+        assertNotNull(response.body())
+        assertEquals(3,response.body().content.size)
     }
 
     @Test

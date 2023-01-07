@@ -4,4 +4,4 @@ import io.micronaut.core.annotation.Introspected
 import javax.validation.constraints.NotBlank
 
 @Introspected
-data class ToDoRequestUpdate(@field:NotBlank val descricao: String, val feito: Boolean)
+data class ToDoRequestUpdate(@field:NotBlank(message = "Campo deve ser preenchido!") val descricao: String, val feito: Boolean)

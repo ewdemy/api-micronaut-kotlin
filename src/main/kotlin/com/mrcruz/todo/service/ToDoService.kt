@@ -4,6 +4,8 @@ import com.mrcruz.todo.model.ToDo
 import com.mrcruz.todo.model.ToDoRequest
 import com.mrcruz.todo.model.ToDoRequestUpdate
 import com.mrcruz.todo.repository.ToDoRepository
+import io.micronaut.data.model.Page
+import io.micronaut.data.model.Pageable
 import jakarta.inject.Singleton
 import javax.persistence.EntityNotFoundException
 import javax.transaction.Transactional
@@ -14,9 +16,11 @@ open class ToDoService(private val toDoRepository: ToDoRepository) {
         val toDo = ToDo(toDoRequest.descricao)
         return toDoRepository.save(toDo)
     }
-
-    fun listar(): List<ToDo>? {
-        return toDoRepository.findAll()
+    fun listar(feito: Boolean?, pageable: Pageable): Page<ToDo>? {
+        if(feito != null){
+            return toDoRepository.findByFeito(feito,pageable)
+        }
+        return toDoRepository.findAll(pageable)
     }
 
     fun buscar(id: Long): ToDo? {

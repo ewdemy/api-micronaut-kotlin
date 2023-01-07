@@ -4,6 +4,8 @@ import com.mrcruz.todo.model.ToDo
 import com.mrcruz.todo.model.ToDoRequest
 import com.mrcruz.todo.model.ToDoRequestUpdate
 import com.mrcruz.todo.service.ToDoService
+import io.micronaut.data.model.Page
+import io.micronaut.data.model.Pageable
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
@@ -12,6 +14,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
+import io.micronaut.http.annotation.QueryValue
 import io.micronaut.validation.Validated
 import javax.validation.Valid
 
@@ -25,8 +28,9 @@ class ToDoController(private val toDoService: ToDoService) {
     }
 
     @Get
-    fun listar(): HttpResponse<List<ToDo>>{
-        return HttpResponse.ok(toDoService.listar())
+    fun listar(@QueryValue feito: Boolean?, pageable: Pageable): HttpResponse<Page<ToDo>>{
+        println(feito)
+        return HttpResponse.ok(toDoService.listar(feito, pageable))
     }
 
     @Get("/{id}")

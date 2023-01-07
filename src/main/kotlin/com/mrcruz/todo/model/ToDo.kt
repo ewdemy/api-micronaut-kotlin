@@ -1,7 +1,7 @@
 package com.mrcruz.todo.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
@@ -12,6 +12,6 @@ class ToDo(var descricao: String) {
     @GeneratedValue
     var id: Long? = null
     var feito: Boolean = false
-    @JsonFormat(pattern="yyyy-MM-dd")
-    val criadoEm: LocalDate = LocalDate.now()
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    val criadoEm: LocalDateTime = LocalDateTime.now()
 }

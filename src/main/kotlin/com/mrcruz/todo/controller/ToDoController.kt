@@ -29,7 +29,6 @@ class ToDoController(private val toDoService: ToDoService) {
 
     @Get
     fun listar(@QueryValue feito: Boolean?, pageable: Pageable): HttpResponse<Page<ToDo>>{
-        println(feito)
         return HttpResponse.ok(toDoService.listar(feito, pageable))
     }
 
@@ -40,7 +39,6 @@ class ToDoController(private val toDoService: ToDoService) {
 
     @Put("/{id}")
     fun atualizar(@PathVariable id: Long, @Body @Valid toDo: ToDoRequestUpdate): HttpResponse<ToDo> {
-        println(toDo)
         return HttpResponse.ok(toDoService.atualizar(id, toDo))
     }
 

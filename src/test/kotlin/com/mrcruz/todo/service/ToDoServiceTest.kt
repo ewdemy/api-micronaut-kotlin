@@ -2,6 +2,7 @@ package com.mrcruz.todo.service
 
 import com.mrcruz.todo.model.ToDo
 import com.mrcruz.todo.model.ToDoRequest
+import com.mrcruz.todo.model.ToDoRequestUpdate
 import com.mrcruz.todo.repository.ToDoRepository
 import io.micronaut.data.model.Page
 import io.micronaut.data.model.Pageable
@@ -106,11 +107,62 @@ internal class ToDoServiceTest {
     }
 
     @Test
-    fun atualizar() {
+    fun deveAtualizarToDo() {
+        val toDo = ToDo("ToDo 1")
+        toDo.id = 1L
+        val toDoUpdate = ToDo("ToDo atualizado")
+        toDoUpdate.id = 1L
+        toDoUpdate.feito = true
+
+        Mockito.`when`(toDoRepository.findById(any())).thenReturn(Optional.of(toDo))
+        Mockito.`when`(toDoRepository.update(any())).thenReturn(toDoUpdate)
+        val toDoMock = toDoService.atualizar(1L, ToDoRequestUpdate("ToDo atualizado", true))
+
+        assertEquals(toDoUpdate.id, toDoMock!!.id)
+        assertEquals(toDoUpdate.descricao, toDoMock.descricao)
+        assertTrue(toDoMock.feito)
     }
 
     @Test
-    fun deletar() {
+    fun deveLancarExcecaoAoAtualizarToDoSemDescricao() {
+        val toDo = ToDo("ToDo 1")
+        toDo.id = 1L
+
+        Mockito.`when`(toDoRepository.findById(any())).thenReturn(Optional.of(toDo))
+        Mockito.`when`(toDoRepository.update(any())).thenThrow(ConstraintViolationException::class.java)
+        assertThrows(ConstraintViolationException::class.java){
+            toDoService.atualizar(1L, ToDoRequestUpdate("", true))
+        }
+
+    }
+
+    @Test
+    fun deveLancarExcecaoAoAtualizarToDoComIdInexistente() {
+
+        Mockito.`when`(toDoRepository.findById(any())).thenReturn(Optional.empty())
+        assertThrows(EntityNotFoundException::class.java){
+            toDoService.atualizar(10L, ToDoRequestUpdate("ToDo Atualizado", true))
+        }
+
+    }
+
+    @Test
+    fun deveDeletarToDo() {
+        val toDo = ToDo("ToDo 1")
+        toDo.id = 1L
+
+        Mockito.`when`(toDoRepository.findById(any())).thenReturn(Optional.of(toDo))
+
+        toDoService.deletar(1L)
+        verify(toDoRepository).delete(any())
+    }
+
+    @Test
+    fun deveLancarExcecaoAoDeletarToDoComIdInexistente() {
+        Mockito.`when`(toDoRepository.findById(any())).thenReturn(Optional.empty())
+        assertThrows(EntityNotFoundException::class.java){
+            toDoService.deletar(10L)
+        }
 
     }
 
